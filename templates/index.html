@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVE Online Asset Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        .card {
+            background: rgba(30, 30, 50, 0.9);
+            border: 1px solid #3a3a5a;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background: rgba(50, 50, 80, 0.9);
+            border-bottom: 1px solid #4a4a6a;
+            color: #00d4ff;
+            font-weight: bold;
+        }
+        .form-label {
+            color: #b0b0c0;
+        }
+        .form-control, .form-select {
+            background: rgba(20, 20, 40, 0.8);
+            border: 1px solid #3a3a5a;
+            color: #e0e0e0;
+        }
+        .form-control:focus, .form-select:focus {
+            background: rgba(30, 30, 60, 0.9);
+            border-color: #00d4ff;
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #0066cc 0%, #004499 100%);
+            border: none;
+            padding: 12px 30px;
+            font-weight: bold;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0077dd 0%, #0055aa 100%);
+        }
+        .eve-title {
+            color: #00d4ff;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+        .alert-success {
+            background: rgba(0, 100, 50, 0.8);
+            border: 1px solid #00aa66;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Header -->
+                <div class="text-center mb-5">
+                    <h1 class="eve-title">🚀 EVE Online Asset Tracker</h1>
+                    <p class="text-muted">Test Application #1 - MOCK DATA ONLY</p>
+                </div>
+
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Asset Form -->
+                <div class="card">
+                    <div class="card-header">
+                        📝 Log New Asset
+                    </div>
+                    <div class="card-body">
+                        <form action="/submit" method="POST" id="assetForm">
+                            <!-- Auto-generated datetime (hidden) -->
+                            <input type="hidden" name="logged_datetime" id="logged_datetime">
+                            
+                            <div class="row">
+                                <!-- Character Name -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="character_name" class="form-label">Character Name *</label>
+                                    <input type="text" class="form-control" id="character_name" name="character_name" required placeholder="Enter EVE character name">
+                                </div>
+
+                                <!-- Asset Type -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="asset_type" class="form-label">Asset Type *</label>
+                                    <select class="form-select" id="asset_type" name="asset_type" required>
+                                        <option value="">Select asset type...</option>
+                                        <option value="Ship">🚀 Ship</option>
+                                        <option value="Module">⚙️ Module</option>
+                                        <option value="Blueprint">📋 Blueprint</option>
+                                        <option value="Resource">💎 Resource</option>
+                                        <option value="Skill Injector">🧬 Skill Injector</option>
+                                        <option value="Other">📦 Other</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <!-- Asset Name -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="asset_name" class="form-label">Asset Name *</label>
+                                    <input type="text" class="form-control" id="asset_name" name="asset_name" required placeholder="e.g., Gila, Neural Boost, Veldspar">
+                                </div>
+
+                                <!-- Quantity -->
+                                <div class="col-md-3 mb-3">
+                                    <label for="quantity" class="form-label">Quantity *</label>
+                                    <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1" required>
+                                </div>
+
+                                <!-- ISK Value -->
+                                <div class="col-md-3 mb-3">
+                                    <label for="isk_value" class="form-label">ISK Value</label>
+                                    <input type="number" class="form-control" id="isk_value" name="isk_value" value="0" min="0" step="0.01" placeholder="0.00">
+                                </div>
+                            </div>
+
+                            <!-- Location -->
+                            <div class="mb-3">
+                                <label for="location" class="form-label">Location</label>
+                                <input type="text" class="form-control" id="location" name="location" placeholder="e.g., Jita IV - Moon 4 - Caldari Navy Assembly Plant">
+                            </div>
+
+                            <!-- Notes -->
+                            <div class="mb-3">
+                                <label for="notes" class="form-label">Notes</label>
+                                <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Additional notes about this asset..."></textarea>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    💾 Log Asset
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Recent Assets Display (Optional) -->
+                <div class="card">
+                    <div class="card-header">
+                        📊 Recent Asset Entries
+                    </div>
+                    <div class="card-body">
+                        <div id="recentAssets">
+                            <p class="text-muted">Loading recent assets...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="text-center mt-4">
+                    <p class="text-muted small">
+                        EVE Online Asset Tracker v1.0 | Local Test Deployment
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-generate datetime on form load
+        document.addEventListener('DOMContentLoaded', function() {
+            const now = new Date();
+            const isoString = now.toISOString();
+            document.getElementById('logged_datetime').value = isoString;
+            
+            // Load recent assets
+            loadRecentAssets();
+        });
+
+        // Load recent assets from API
+        async function loadRecentAssets() {
+            try {
+                const response = await fetch('/assets');
+                const assets = await response.json();
+                
+                const container = document.getElementById('recentAssets');
+                
+                if (assets.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No assets logged yet.</p>';
+                    return;
+                }
+                
+                let html = '<div class="table-responsive"><table class="table table-dark table-hover"><thead><tr><th>ID</th><th>Character</th><th>Type</th><th>Asset</th><th>Qty</th><th>Location</th><th>ISK</th></tr></thead><tbody>';
+                
+                for (const asset of assets) {
+                    html += `<tr>
+                        <td>${asset.id}</td>
+                        <td>${asset.character_name}</td>
+                        <td>${asset.asset_type}</td>
+                        <td>${asset.asset_name}</td>
+                        <td>${asset.quantity}</td>
+                        <td>${asset.location || '-'}</td>
+                        <td>${asset.isk_value.toLocaleString()} ISK</td>
+                    </tr>`;
+                }
+                
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading assets:', error);
+            }
+        }
+
+        // Reload assets after form submission
+        document.getElementById('assetForm').addEventListener('submit', function() {
+            setTimeout(loadRecentAssets, 1000);
+        });
+    </script>
+</body>
+</html>
